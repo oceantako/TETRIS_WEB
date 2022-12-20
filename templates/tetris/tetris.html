@@ -1,0 +1,64 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テトリス</title>
+    <link rel="stylesheet" href="{% static 'tetris/css/tetris.css' %}">
+    <!-- <link rel="stylesheet" href="css/tetris.css"> -->
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="js/tetrisscript.js"></script> -->
+    <script type="text/javascript" src="{% static 'tetris/js/tetrisscript.js' %}"></script>
+</head>
+<body>
+    {% if userInf %}
+        <header>こんにちは、{{ userInf.name }}さん</header>
+    {% else %}
+        <header>こんにちは ゲストさん</header>
+    {% endif %} 
+
+    <div class="center">
+        <div class="title">
+            Tetris Game!!!
+        </div>
+        <div class="ranking_area">
+            <div class="ranking_button">Weekly<br>Ranking >>></div>
+            <div class="ranking_button">Monthly<br>Ranking >>></div>
+            <div class="ranking_button">All Season<br>Ranking >>></div>
+        </div>
+        <div class="gamearea">
+            <table class="tetris_table"></table>
+            <div class="kekka">
+                <div class="blockcount"></div>
+                <div class="tetrisrank"></div>
+                <div class="aboutrank">
+                    -------about rank------- <br><br>
+                    ~ 10blocks : F <br>
+                    ~ 40blocks : E <br>
+                    ~ 50blocks : D <br>
+                    ~ 60blocks : C <br>
+                    ~ 80blocks : B <br>
+                    ~ 100blocks : A <br>
+                    ~ 120blocks : S <br>
+                    ~ 150blocks : SS <br>
+                    151blocks ~ : secret <br>
+                </div>
+            </div>
+        </div>
+        <div class="yokonarabi">
+            <div class="tetris_button">START!!</div>
+        </div>
+    </div>
+</body>
+<script>
+    $(".tetris_button").on("click", function() {
+        start();
+    });
+
+    function testtanaka() {
+        alert("testtanaka");
+    }
+</script>
+</html>

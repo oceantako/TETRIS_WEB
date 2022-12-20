@@ -1,0 +1,63 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>typing game</title>
+    <!-- <link rel="stylesheet" href="css/UserCreate.css"> -->
+    <link rel="stylesheet" href="{% static 'tetris/css/UserCreate.css' %}">
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+</head>
+<body class="typepage">
+    <header></header>
+    <div class="center">
+        <div class="title">
+            Tetris Game!!!
+        </div>
+
+        {% if error_message %}
+            <div class="subtitle">
+                {{ error_message }}
+            </div>
+        {% else %}
+        <div class="subtitle">
+            ユーザ名とパスワードを入力して、SAVEボタンを押してください。<br>
+            すでに登録されているユーザ名は登録できません。
+        </div>
+        {% endif %}
+
+        <form action="{% url 'UserCreate' %}" method="post" name="UserCreate_form">
+            {% csrf_token %}
+            <div>
+                <input type="text" placeholder="USERNAME" class="textarea" name="name" required>
+            </div>
+            <div>
+                <input type="text" placeholder="PASSWORD" class="textarea" name="password" required>
+            </div> 
+            <div>
+                <input type="text" placeholder="Retype PASSWORD" class="textarea" name="password2" required>
+            </div> 
+
+            <div class="buttom_area">
+                <label>
+                    <div class="go_buttom">SAVE</div>
+                    <input type="submit" style="display:none">
+                </label>
+            </div>
+        </form>
+        <div class="rinkarea1">
+            <a href="{% url 'login' %}">ログイン画面へ戻る＞＞＞＞</a>
+        </div>
+            
+    </div>
+
+    <footer></footer>
+</body>
+<script>
+    // $(".go_buttom").on("click", function(){
+    //     document.UserCreate_form.submit();
+    // })
+</script>
+</html>

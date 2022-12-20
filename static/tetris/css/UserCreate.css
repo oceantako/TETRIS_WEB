@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css?family=Bangers');
+@import url('https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c');
+
+/* リセット　*/
+* {
+    margin: 0;
+    padding: 0;
+}
+/* 大枠 */
+body {
+    width: 100%;
+}
+/* メニュー画面 */
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    margin-bottom: auto;
+    width: 900px;
+}
+.title{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 120px;
+    font-family: 'Bangers', cursive;
+    color: rgb(34, 141, 155);
+    height: 100px;
+}
+.subtitle{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 25px;
+    color: rgb(175, 106, 15);
+    font-family: "Hiragino Sans","ヒラギノ角ゴシック";
+    font-weight: 900;
+}
+.textarea{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 70px;
+    box-sizing: border-box;
+    font-family: 'ヒラギノ角ゴ Pro W3';
+    color: rgb(41, 129, 145);
+    width: 900px;
+}
+.buttom_area {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 300px;
+}
+.go_buttom {
+    margin-left: auto;
+    margin-right: auto;
+    width: 250px;
+    height: 75px;
+    text-align: center;
+    border: 2px solid rgb(54, 143, 179);
+    font-size: 75px;
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: .4s;
+    margin-top: 1px;
+    cursor: pointer;
+    font-family: 'Bangers', cursive;
+}
+.go_buttom:hover {
+    background-color: #000;
+    border-color: rgb(88, 133, 151);
+    color: snow;
+}
+/* リンク */
+.rinkarea1{
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 900px;
+    text-align: right;
+}
+a{
+	color: #5093a3; /*--オーシャンブルー--*/
+    font-family: 'ヒラギノ角ゴ Pro W3';
+}

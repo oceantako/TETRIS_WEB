@@ -1,0 +1,9 @@
+{% if User_list %}
+    <ul>
+    {% for UserList in User_list %}
+        <li><a href="/tetris/{{ UserList.name }}/login">{{ UserList.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}

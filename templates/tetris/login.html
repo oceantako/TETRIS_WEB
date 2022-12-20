@@ -1,0 +1,55 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>typing game</title>
+    <!-- <link rel="stylesheet" href="css/login.css"> -->
+    <link rel="stylesheet" href="{% static 'tetris/css/login.css' %}">
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script type="text/javascript" src="js/login.js"></script>
+</head>
+<body class="typepage">
+    <header></header>
+    <div class="center">
+        <div class="title">
+            Tetris Game!!!
+        </div>
+        {% if error_message %}
+            <div class="subtitle">
+                {{ error_message }}
+            </div>
+        {% endif %}
+        <form action="{% url 'login' %}" method="post" name="login_form">
+            {% csrf_token %}
+            <div>
+                <input type="text" placeholder="USERNAME" class="textarea" name="name" required>
+            </div>
+            <div>
+                <input type="text" placeholder="PASSWORD" class="textarea" name="password" required>
+            </div> 
+
+            <div class="buttom_area">
+                <label>
+                    <div class="go_buttom">LOGIN</div>
+                    <input type="submit" style="display:none">
+                </label>
+            </div>
+        </form>
+
+        <div class="rinkarea1">
+            <a href="{% url 'UserCreate' %}">新規ユーザ登録はこちら＞＞＞＞</a>
+        </div>
+            
+    </div>
+
+    <footer></footer>
+</body>
+<script>
+    // $(".go_buttom").on("click", function(){
+    //     document.login_form.submit();
+    // })
+</script>
+</html>
