@@ -98,6 +98,7 @@ function start() {
 
     //ループ開始
     looperid = requestAnimationFrame(mainLoop);
+
 }
 
 
@@ -151,7 +152,7 @@ function mainLoop() {
         if (flowerBox[4][c] >= 100) {
             cancelAnimationFrame(looperid);
             KEKKA();
-            testtanaka();
+            testtanaka(blockcounter);
             return;
         }
     }

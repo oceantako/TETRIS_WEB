@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpResponse,Http404
-from .models import User
+from django.http import HttpResponse,Http404,JsonResponse
+from .models import User,TetrisResult
 from .forms import LoginForm
 from django.template import loader
+from django.utils.timezone import make_aware
+import datetime
 
 #ログイン処理
 def Login(request):
@@ -66,6 +68,65 @@ def UserCreate(request):
 
         error_message = "ユーザ登録が完了しました。ログインしてください。"
         return render(request, 'tetris/login.html', {'error_message': error_message})
+
+
+#テトリス結果登録処理
+def tetris_result_submit(request):
+
+    name = request.POST.get('username')
+    blockcount = int(request.POST.get('blockcounter'))
+
+    # ユーザ情報を取得
+    UserInf = User.objects.get(name=name)
+
+    #直近の月曜日0時0分を取得
+    dt1 = make_aware(datetime.datetime.now())
+    dayweek = dt1.weekday()
+    dt2 = dt1 + datetime.timedelta(days=-dayweek)
+    Monday = dt2.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    #今種の最大落下ブロック数を取得
+    weekly_max = UserInf.tetrisresult_set.filter(date__gte=Monday).order_by('blockcount').reverse().first()
+
+    #今週登録されたデータが存在する場合 = / 今週の最高記録の場合-最高記録をupdateする / 今週の最高記録でない場合-登録しない /
+    if weekly_max:
+        weekly_max_blocks = weekly_max.blockcount
+        
+        if blockcount > weekly_max_blocks:
+            weekly_max.blockcount = blockcount
+            weekly_max.date = make_aware(datetime.datetime.now())
+            weekly_max.save()
+            result_json = {'result': 'weekly_max'}
+        else:
+            result_json = {'result': 'notsubmit'}
+    
+    #今週登録されたデータが存在しない場合 = 登録する
+    else:
+        UserInf.tetrisresult_set.create(
+                name = name,
+                blockcount = blockcount,
+                date = datetime.datetime.now()
+            )
+        result_json = {'result': 'weekly_first'} 
+    
+    return JsonResponse(result_json)
+
+
+def submittest(request):
+    name = "tacook"
+    blockcount = 73
+    date = None
+
+    UserInf = User.objects.get(name=name)
+    UserInf.tetrisresult_set.create(
+        name = name,
+        blockcount = blockcount,
+        date = datetime.datetime.now()
+    )
+
+    return HttpResponse("good")
+
+
 
 def login2(request, login_name):
     user_list = User.objects.order_by('name')[:5]

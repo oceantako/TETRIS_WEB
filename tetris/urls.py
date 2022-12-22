@@ -7,4 +7,6 @@ urlpatterns = [
     path('<str:login_name>/login', views.login_DB, name='login_DB'),
     path('login', views.Login, name='login'),
     path('UserCreate', views.UserCreate, name='UserCreate'),
+    path('tetris_result_submit', views.tetris_result_submit, name='tetris_result_submit'),
+    path('submittest', views.submittest, name='submittest'),
 ]

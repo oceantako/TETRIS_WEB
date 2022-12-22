@@ -51,14 +51,79 @@
             <div class="tetris_button">START!!</div>
         </div>
     </div>
+
+    <!-- ログイン済みユーザの場合はランキング登録用項目を設定 -->
+    {% if userInf %} 
+        <input type="hidden" name="blockcount">
+        <input type="hidden" name="username" id="username" value="{{ userInf.name }}">
+    {% endif %}
+
 </body>
 <script>
     $(".tetris_button").on("click", function() {
         start();
     });
 
-    function testtanaka() {
-        alert("testtanaka");
+    // Ajax用関数
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  var csrftoken = getCookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+
+  $.ajaxSetup({
+      beforeSend: function (xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+    // Ajax用関数ここまで
+
+    //ゲーム終了時=結果をサーバへ転送（Ajax処理）
+    function testtanaka(blockcounter) {
+        $.ajax({
+                'url': '{% url "tetris_result_submit" %}',
+                'type': 'POST',
+                'data': {
+                    'username': $('#username').val(),
+                    'blockcounter': blockcounter,
+                },
+                'dataType': 'json'
+            })
+        .done(function(response){
+            let submit_result = response.result
+
+            if (submit_result == "weekly_first") {
+                
+            }
+            if (submit_result == "weekly_first") {
+                
+            }
+            if (submit_result == "weekly_first") {
+                
+            }
+        })
+        .fail(function(){
+            
+        });
     }
 </script>
 </html>

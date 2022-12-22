@@ -12,5 +12,5 @@ class TetrisResult(models.Model):
     blockcount = models.IntegerField(default=0)
     date = models.DateTimeField()
     def __str__(self):
-        return self.blockcount
+        return str(self.name)
 
