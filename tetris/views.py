@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse,Http404,JsonResponse
 from .models import User,TetrisResult
+from django.db.models import Max
 from .forms import LoginForm
 from django.template import loader
 from django.utils.timezone import make_aware
@@ -110,6 +111,67 @@ def tetris_result_submit(request):
         result_json = {'result': 'weekly_first'} 
     
     return JsonResponse(result_json)
+
+
+#WEEKLY RANKING出力処理
+def weekly_ranking(request):
+    name = request.POST.get('user_name')
+
+    #直近の月曜日0時0分を取得
+    dt1 = make_aware(datetime.datetime.now())
+    dayweek = dt1.weekday()
+    dt2 = dt1 + datetime.timedelta(days=-dayweek)
+    Monday = dt2.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # weeklyrankingを取得
+    weekly_ranking = User.objects.prefetch_related(
+                        ).filter(
+                            tetrisresult__date__gte=Monday
+                        ).values("name").annotate(
+                            weekly_MAX=Max('tetrisresult__blockcount')
+                        ).order_by(
+                            'weekly_MAX'
+                        ).reverse()
+
+
+weekly_ranking = User.objects.prefetch_related(
+                        ).filter(
+                            tetrisresult__date__gte=Monday
+                        ).values("name").annotate(
+                            weekly_MAX=Max('tetrisresult__blockcount')
+                        ).values("weekly_MAX","name")
+
+
+TetrisResult.objects.filter(date__gte=Monday, , blockcount=sl_blockcount)
+
+
+    # 画面用listの作成
+    screen_list = []
+
+    # weeklyランキング用の日付を取得⇒画面用listに格納
+    for ranking_item in weekly_ranking:
+        sl_name = ranking_item["name"]
+        sl_blockcount = ranking_item["weekly_MAX"]
+
+        weekly_max_col = TetrisResult.objects.filter(date__gte=Monday, name__name=sl_name, blockcount=sl_blockcount).first()
+        weekly_max_date = weekly_max_col.date
+        
+        date_str = weekly_max_date.strftime('%Y年%m月%d日 %a')
+
+        ranking_item["date"] = date_str
+        screen_list.append(ranking_item)
+
+
+    return HttpResponse("good")
+
+
+
+def monthly_ranking(request):
+    return HttpResponse("good")
+
+def all_season_ranking(request):
+    return HttpResponse("good")
+
 
 
 def submittest(request):

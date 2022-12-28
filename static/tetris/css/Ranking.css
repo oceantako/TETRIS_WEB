@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css?family=Bangers');
+@import url('https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c');
+
+body {
+    margin-top: 0px;
+}
+.title{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 120px;
+    font-family: 'Bangers', cursive;
+    color: rgb(34, 141, 155);
+    line-height: 100px;
+}

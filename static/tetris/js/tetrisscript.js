@@ -353,7 +353,10 @@ function UnderErase() {
 function KEKKA() {
     $(".kekka").addClass("kekkahyouzi");
 
-    let blockcounttext = "count:" + blockcounter + "blocks";        //count:57blocks
+     $(".blockcount").children().remove();
+    $(".tetrisrank").children().remove();
+
+    let blockcounttext = '<div>count:<font size="8" color="red">&nbsp;' + blockcounter + "&nbsp;</font>blocks</div>";        //count:57blocks    
     let ranktext;
     let rank;
 
@@ -368,10 +371,10 @@ function KEKKA() {
         rank = "テトリスの神様"
     }
 
-    ranktext = "rank:" + rank;                      //rank:B
+    ranktext = '<div>rank:<font size="7" color="red"><b>&nbsp;' + rank + "&nbsp;</b></font></div>";                       //rank:B
 
-    $(".blockcount").text(blockcounttext);
-    $(".tetrisrank").text(ranktext);
+    $(".blockcount").append(blockcounttext);
+    $(".tetrisrank").append(ranktext);
 
 
     // -------about rank-------

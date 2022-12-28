@@ -24,9 +24,9 @@
             Tetris Game!!!
         </div>
         <div class="ranking_area">
-            <div class="ranking_button">Weekly<br>Ranking >>></div>
-            <div class="ranking_button">Monthly<br>Ranking >>></div>
-            <div class="ranking_button">All Season<br>Ranking >>></div>
+            <div class="ranking_button weekly_b">Weekly<br>Ranking >>></div>
+            <div class="ranking_button monthly_b">Monthly<br>Ranking >>></div>
+            <div class="ranking_button allseason_b">All Season<br>Ranking >>></div>
         </div>
         <div class="gamearea">
             <table class="tetris_table"></table>
@@ -34,17 +34,18 @@
                 <div class="blockcount"></div>
                 <div class="tetrisrank"></div>
                 <div class="aboutrank">
-                    -------about rank------- <br><br>
-                    ~ 10blocks : F <br>
-                    ~ 40blocks : E <br>
-                    ~ 50blocks : D <br>
-                    ~ 60blocks : C <br>
-                    ~ 80blocks : B <br>
-                    ~ 100blocks : A <br>
-                    ~ 120blocks : S <br>
-                    ~ 150blocks : SS <br>
-                    151blocks ~ : secret <br>
+                    ---------------about rank--------------- <br><br>
+                    ~ 10blocks : &nbsp;F <br>
+                    ~ 40blocks : &nbsp;E <br>
+                    ~ 50blocks : &nbsp;D <br>
+                    ~ 60blocks : &nbsp;C <br>
+                    ~ 80blocks : &nbsp;B <br>
+                    ~ 100blocks : &nbsp;A <br>
+                    ~ 120blocks : &nbsp;S <br>
+                    ~ 150blocks : &nbsp;SS <br>
+                    151blocks ~ : &nbsp;?????? <br>
                 </div>
+				<div class="message_area">今週の最高記録です！！ランキングが更新されました！！</div>
             </div>
         </div>
         <div class="yokonarabi">
@@ -52,17 +53,61 @@
         </div>
     </div>
 
-    <!-- ログイン済みユーザの場合はランキング登録用項目を設定 -->
+    <!-- ログイン済みユーザの場合はデータベース登録用項目を設定 -->
     {% if userInf %} 
         <input type="hidden" name="blockcount">
         <input type="hidden" name="username" id="username" value="{{ userInf.name }}">
     {% endif %}
 
+    <!-- ランキング画面遷移用form -->
+    <form name="ranking_form">
+        {% csrf_token %}
+    </form>
+
 </body>
 <script>
+
+    //テトリスゲームスタートボタン押下時
     $(".tetris_button").on("click", function() {
         start();
     });
+
+    //weeklyranking
+    $(".weekly_b").on("click", function() {
+        let user_name = $('#username').val()
+        ranking_post('{% url "weekly_ranking" %}', {name: user_name});
+    });
+    //monthlyranking
+    $(".monthly_b").on("click", function() {
+        let user_name = $('#username').val()
+        ranking_post('{% url "monthly_ranking" %}', {name: user_name});
+    });
+    //allseasonranking
+    $(".allseason_b").on("click", function() {
+        let user_name = $('#username').val()
+        ranking_post('{% url "all_season_ranking" %}', {name: user_name});
+    });
+
+    //ランキング画面遷移用（formを作ってpostで転送）
+    function ranking_post(path, params, method='post') {
+
+        const form = document.ranking_form
+        form.method = method;
+        form.action = path;
+
+        for (const key in params) {
+        if (params.hasOwnProperty(key)) {
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = key;
+            hiddenField.value = params[key];
+
+            form.appendChild(hiddenField);
+        }
+        }
+
+        form.submit();
+    }
 
     // Ajax用関数
     function getCookie(name) {
@@ -112,17 +157,17 @@
             let submit_result = response.result
 
             if (submit_result == "weekly_first") {
-                
+                $(".message_area").text("今週最初のプレーでした！ランキングが更新されました！！");
             }
-            if (submit_result == "weekly_first") {
-                
+            if (submit_result == "weekly_max") {
+                $(".message_area").text("今週の最高記録です！！ランキングが更新されました！！");
             }
-            if (submit_result == "weekly_first") {
-                
+            if (submit_result == "notsubmit") {
+                $(".message_area").text("ないすプレーでした。");
             }
         })
         .fail(function(){
-            
+            $(".message_area").text("申し訳ございません。データの転送に失敗しました。");
         });
     }
 </script>

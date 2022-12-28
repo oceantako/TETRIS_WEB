@@ -109,6 +109,14 @@ header {
     line-height: 30px;
     font-family: 'Bangers', cursive;
 }
+.message_area {
+    margin-top: 30px;
+    line-height: 30px;
+    font-size: 25px;
+    color: rgb(253, 17, 0);
+    font-family: "Hiragino Sans","ヒラギノ角ゴシック";
+    font-weight: 900;
+}
 .tetris_table {
     margin: 10px auto;
     table-layout: fixed;
