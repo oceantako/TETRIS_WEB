@@ -1,9 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse,Http404,JsonResponse
-from .models import User,TetrisResult
-from django.db.models import Max
-from .forms import LoginForm
-from django.template import loader
+from .models import User, WeeklyRanking, MonthlyRanking, AllSeasonRanking, RankSelecter
 from django.utils.timezone import make_aware
 import datetime
 
@@ -80,14 +77,111 @@ def tetris_result_submit(request):
     # ユーザ情報を取得
     UserInf = User.objects.get(name=name)
 
+    #ランキングテーブル登録処理
+    result_weekly = weekly_ranking_submit(name, UserInf, blockcount)
+    result_monthly = monthly_ranking_submit(name, UserInf, blockcount)
+    result_allseason = allseason_ranking_submit(name, UserInf, blockcount)
+
+    #画面に返す値を格納
+    result_json = {'result': result_weekly}
+
+    if result_monthly != "not_submit":
+        result_json = {'result': result_monthly}
+    
+    if result_allseason != "not_submit":
+        result_json = {'result': result_allseason}
+    
+    return JsonResponse(result_json)
+
+
+#RANKING出力処理
+def ranking(request):
+    name = request.POST.get('name')
+    ranking_type = request.POST.get('ranking_type')
+
+    #本日日付を取得
+    dt1 = make_aware(datetime.datetime.now())
+
+    #直近の月曜日0時0分を取得
+    dayweek = dt1.weekday()
+    dt2 = dt1 + datetime.timedelta(days=-dayweek)
+    Monday = dt2.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    #今月の1日の日付を取得
+    ThisMonthDay1 = dt1.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    #rankingを取得
+    if ranking_type == 'weekly':
+        ranking_List = WeeklyRanking.objects.filter(date__gte=Monday).order_by('blockcount').reverse()
+    elif ranking_type == 'monthly':
+        ranking_List = MonthlyRanking.objects.filter(date__gte=ThisMonthDay1).order_by('blockcount').reverse()
+    elif ranking_type == 'allseason':
+        ranking_List = AllSeasonRanking.objects.all().order_by('blockcount').reverse()
+    
+    #ランク決定用リストを作成
+    rankselect = RankSelecter.objects.all()
+
+    #画面用listの作成
+    screen_list = []
+    
+    #画面用listに値を格納　⇒　名前、ブロック数、獲得ランク、称号、日付
+    for ranking_item in ranking_List:
+        item_dict = {}
+        item_dict["name"] = ranking_item.user.name
+        item_dict["blockcount"] = ranking_item.blockcount
+        for rank_item in rankselect:
+            if ranking_item.blockcount < rank_item.underblocks:
+                 item_dict["rank"] = rank_item.rank
+                 item_dict["syougou"] = rank_item.syougou
+                 break
+        item_dict["date"] = ranking_item.date.strftime('%Y年%m月%d日 %a')
+
+        screen_list.append(item_dict)
+                
+    return render(request, 'tetris/ranking.html', {'screen_list': screen_list, 'name': name, 'ranking_kind': ranking_type})
+
+#ランキング画面からの戻り処理
+def redisp_tetris(request):
+  
+    #画面項目を変数へ格納
+    name = request.POST['name']
+
+    # DB検索
+    UserInf = User.objects.filter(name=name).first()
+
+    # テトリス画面へ
+    return render(request, 'tetris/tetris.html', {'userInf': UserInf})
+
+
+#遊び方表示
+def HowToEnjoy(request):
+  
+    #画面項目を変数へ格納
+    name = request.POST['name']
+
+    # テトリス画面へ
+    return render(request, 'tetris/HowToEnjoy.html', {'name': name})
+
+#お知らせ表示
+def Osirase(request):
+  
+    #画面項目を変数へ格納
+    name = request.POST['name']
+
+    # テトリス画面へ
+    return render(request, 'tetris/Osirase.html', {'name': name})
+
+
+def weekly_ranking_submit(name, UserInf, blockcount):
+
     #直近の月曜日0時0分を取得
     dt1 = make_aware(datetime.datetime.now())
     dayweek = dt1.weekday()
     dt2 = dt1 + datetime.timedelta(days=-dayweek)
     Monday = dt2.replace(hour=0, minute=0, second=0, microsecond=0)
 
-    #今種の最大落下ブロック数を取得
-    weekly_max = UserInf.tetrisresult_set.filter(date__gte=Monday).order_by('blockcount').reverse().first()
+    #今週の最大落下ブロック数を取得
+    weekly_max = UserInf.weeklyranking_set.filter(date__gte=Monday).order_by('blockcount').reverse().first()
 
     #今週登録されたデータが存在する場合 = / 今週の最高記録の場合-最高記録をupdateする / 今週の最高記録でない場合-登録しない /
     if weekly_max:
@@ -97,122 +191,81 @@ def tetris_result_submit(request):
             weekly_max.blockcount = blockcount
             weekly_max.date = make_aware(datetime.datetime.now())
             weekly_max.save()
-            result_json = {'result': 'weekly_max'}
+            result_text = "weekly_max"
         else:
-            result_json = {'result': 'notsubmit'}
+            result_text = "not_submit"
     
     #今週登録されたデータが存在しない場合 = 登録する
     else:
-        UserInf.tetrisresult_set.create(
-                name = name,
+        UserInf.weeklyranking_set.create(
+                user = name,
                 blockcount = blockcount,
                 date = datetime.datetime.now()
             )
-        result_json = {'result': 'weekly_first'} 
+        result_text = "weekly_fs"
     
-    return JsonResponse(result_json)
+    return result_text
 
 
-#WEEKLY RANKING出力処理
-def weekly_ranking(request):
-    name = request.POST.get('user_name')
+#monthlyランキング登録処理
+def monthly_ranking_submit(name, UserInf, blockcount):
 
-    #直近の月曜日0時0分を取得
+    #今月の1日の日付を取得
     dt1 = make_aware(datetime.datetime.now())
-    dayweek = dt1.weekday()
-    dt2 = dt1 + datetime.timedelta(days=-dayweek)
-    Monday = dt2.replace(hour=0, minute=0, second=0, microsecond=0)
+    ThisMonthDay1 = dt1.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-    # weeklyrankingを取得
-    weekly_ranking = User.objects.prefetch_related(
-                        ).filter(
-                            tetrisresult__date__gte=Monday
-                        ).values("name").annotate(
-                            weekly_MAX=Max('tetrisresult__blockcount')
-                        ).order_by(
-                            'weekly_MAX'
-                        ).reverse()
+    #今月の最大落下ブロック数を取得
+    monthly_max = UserInf.monthlyranking_set.filter(date__gte=ThisMonthDay1).order_by('blockcount').reverse().first()
 
-
-weekly_ranking = User.objects.prefetch_related(
-                        ).filter(
-                            tetrisresult__date__gte=Monday
-                        ).values("name").annotate(
-                            weekly_MAX=Max('tetrisresult__blockcount')
-                        ).values("weekly_MAX","name")
-
-
-TetrisResult.objects.filter(date__gte=Monday, , blockcount=sl_blockcount)
-
-
-    # 画面用listの作成
-    screen_list = []
-
-    # weeklyランキング用の日付を取得⇒画面用listに格納
-    for ranking_item in weekly_ranking:
-        sl_name = ranking_item["name"]
-        sl_blockcount = ranking_item["weekly_MAX"]
-
-        weekly_max_col = TetrisResult.objects.filter(date__gte=Monday, name__name=sl_name, blockcount=sl_blockcount).first()
-        weekly_max_date = weekly_max_col.date
+    #今月登録されたデータが存在する場合 = / 今月の最高記録の場合-最高記録をupdateする / 今月の最高記録でない場合-登録しない /
+    if monthly_max:
+        monthly_max_blocks = monthly_max.blockcount
         
-        date_str = weekly_max_date.strftime('%Y年%m月%d日 %a')
-
-        ranking_item["date"] = date_str
-        screen_list.append(ranking_item)
-
-
-    return HttpResponse("good")
-
-
-
-def monthly_ranking(request):
-    return HttpResponse("good")
-
-def all_season_ranking(request):
-    return HttpResponse("good")
-
-
-
-def submittest(request):
-    name = "tacook"
-    blockcount = 73
-    date = None
-
-    UserInf = User.objects.get(name=name)
-    UserInf.tetrisresult_set.create(
-        name = name,
-        blockcount = blockcount,
-        date = datetime.datetime.now()
-    )
-
-    return HttpResponse("good")
-
-
-
-def login2(request, login_name):
-    user_list = User.objects.order_by('name')[:5]
-    output = ', '.join([q.name for q in user_list])
-    return HttpResponse(output)
-
-def login_test(request, login_name):
-    user_list = User.objects.order_by('name')[:5]
-    template = loader.get_template('tetris/test.html')
-    #画面側の変数とview側の変数を紐づける
-    context = {
-        'User_list': user_list,
-    }
-    return HttpResponse(template.render(context, request))
+        if blockcount > monthly_max_blocks:
+            monthly_max.blockcount = blockcount
+            monthly_max.date = make_aware(datetime.datetime.now())
+            monthly_max.save()
+            result_text = "monthly_max"
+        else:
+            result_text = "not_submit"
     
-    #↓これでもOK(かっこいいやり方？)
-    #return render(request, 'tetris/test.html', context)
+    #今月登録されたデータが存在しない場合 = 登録する
+    else:
+        UserInf.monthlyranking_set.create(
+                user = name,
+                blockcount = blockcount,
+                date = datetime.datetime.now()
+            )
+        result_text = "monthly_fs"
+    
+    return result_text
 
-#DBを検索してユーザが登録されていれば、テトリス画面へ
-def login_DB(request, login_name):
-    try:
-        username = User.objects.get(name=login_name)
-    except User.DoseNotExist:
-        raise Http404("User dose not exist")
-    return render(request, 'tetris/tetris.html', {'username': username})
 
-# Create your views here.
+#AllSeasonランキング登録処理
+def allseason_ranking_submit(name, UserInf, blockcount):
+
+    #オールシーズンの最大落下ブロック数を取得
+    all_season_max = UserInf.allseasonranking_set.all().order_by('blockcount').reverse().first()
+
+    #登録されたデータが存在する場合 = / 最高記録の場合-最高記録をupdateする / 最高記録でない場合-登録しない /
+    if all_season_max:
+        all_season_max_blocks = all_season_max.blockcount
+        
+        if blockcount > all_season_max_blocks:
+            all_season_max.blockcount = blockcount
+            all_season_max.date = make_aware(datetime.datetime.now())
+            all_season_max.save()
+            result_text = "allseason_max"
+        else:
+            result_text = "not_submit"
+    
+    #登録されたデータが存在しない場合 = 登録する
+    else:
+        UserInf.allseasonranking_set.create(
+                user = name,
+                blockcount = blockcount,
+                date = datetime.datetime.now()
+            )
+        result_text = "allseason_fs"
+    
+    return result_text

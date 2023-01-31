@@ -5,16 +5,18 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テトリス</title>
+    <title>tetrisweb</title>
     <link rel="stylesheet" href="{% static 'tetris/css/tetris.css' %}">
-    <!-- <link rel="stylesheet" href="css/tetris.css"> -->
     <script src="http://code.jquery.com/jquery.min.js"></script>
-    <!-- <script type="text/javascript" src="js/tetrisscript.js"></script> -->
     <script type="text/javascript" src="{% static 'tetris/js/tetrisscript.js' %}"></script>
 </head>
 <body>
     {% if userInf %}
-        <header>こんにちは、{{ userInf.name }}さん</header>
+        <header>
+            <div style="width: 180px"></div>
+            <div style="width: 800px">こんにちは、{{ userInf.name }}さん</div>
+            <div style="width: 180px;"><a href="{% url 'login' %}" style="color: white;">ログアウト＞＞</a></div>
+        </header>
     {% else %}
         <header>こんにちは ゲストさん</header>
     {% endif %} 
@@ -45,11 +47,18 @@
                     ~ 150blocks : &nbsp;SS <br>
                     151blocks ~ : &nbsp;?????? <br>
                 </div>
-				<div class="message_area">今週の最高記録です！！ランキングが更新されました！！</div>
+				<div class="message_area"></div>
             </div>
         </div>
         <div class="yokonarabi">
             <div class="tetris_button">START!!</div>
+        </div>
+        <div class="asobikata">
+            <a href="javascript:OnLinkClick1();">遊び方＞＞＞＞</a>
+        </div>
+        <div style="height: 5px;"></div>
+        <div class="asobikata">
+            <a href="javascript:OnLinkClick2();">お知らせ＞＞＞</a>
         </div>
     </div>
 
@@ -63,7 +72,6 @@
     <form name="ranking_form">
         {% csrf_token %}
     </form>
-
 </body>
 <script>
 
@@ -72,24 +80,36 @@
         start();
     });
 
-    //weeklyranking
+    //weeklyrankingボタン押下時
     $(".weekly_b").on("click", function() {
         let user_name = $('#username').val()
-        ranking_post('{% url "weekly_ranking" %}', {name: user_name});
+        multi_post('{% url "ranking" %}', {name: user_name, ranking_type: "weekly"});
     });
-    //monthlyranking
+    //monthlyrankingボタン押下時
     $(".monthly_b").on("click", function() {
         let user_name = $('#username').val()
-        ranking_post('{% url "monthly_ranking" %}', {name: user_name});
+        multi_post('{% url "ranking" %}', {name: user_name, ranking_type: "monthly"});
     });
-    //allseasonranking
+    //allseasonrankingボタン押下時
     $(".allseason_b").on("click", function() {
         let user_name = $('#username').val()
-        ranking_post('{% url "all_season_ranking" %}', {name: user_name});
+        multi_post('{% url "ranking" %}', {name: user_name, ranking_type: "allseason"});
     });
 
-    //ランキング画面遷移用（formを作ってpostで転送）
-    function ranking_post(path, params, method='post') {
+    // 遊び方リンククリック
+    function OnLinkClick1() {
+        let user_name = $('#username').val()
+        multi_post('{% url "HowToEnjoy" %}', {name: user_name });
+    }
+
+    // お知らせリンククリック
+    function OnLinkClick2() {
+        let user_name = $('#username').val()
+        multi_post('{% url "Osirase" %}', {name: user_name });
+    }
+
+    //POST転送メソッド
+    function multi_post(path, params, method='post') {
 
         const form = document.ranking_form
         form.method = method;
@@ -156,13 +176,25 @@
         .done(function(response){
             let submit_result = response.result
 
-            if (submit_result == "weekly_first") {
-                $(".message_area").text("今週最初のプレーでした！ランキングが更新されました！！");
+            if (submit_result == "allseason_fs") {
+                $(".message_area").text("あなたの最初のプレーでした！ランキングに登録されました！");
+            }
+            if (submit_result == "allseason_max") {
+                $(".message_area").text("おめでとうございます！！自己新記録です！！");
+            }
+            if (submit_result == "monthly_fs") {
+                $(".message_area").text("今月最初のプレーでした！MontylyRankingに登録されました！！");
+            }
+            if (submit_result == "monthly_max") {
+                $(".message_area").text("おめでとうございます！！今月の最高記録を更新しました！！");
+            }
+            if (submit_result == "weekly_fs") {
+                $(".message_area").text("今週最初のプレーでした！WeeklyRankingに登録されました！！");
             }
             if (submit_result == "weekly_max") {
-                $(".message_area").text("今週の最高記録です！！ランキングが更新されました！！");
+                $(".message_area").text("おめでとうございます！！WeeklyRankingに登録されました！！");
             }
-            if (submit_result == "notsubmit") {
+            if (submit_result == "not_submit") {
                 $(".message_area").text("ないすプレーでした。");
             }
         })
@@ -170,5 +202,6 @@
             $(".message_area").text("申し訳ございません。データの転送に失敗しました。");
         });
     }
+
 </script>
 </html>

@@ -45,10 +45,8 @@ let looperid;
 window.onload = function() {
     //テーブル初期化
     tablecreate();
-
+    
     window.addEventListener('keydown', keyDown, true);
-
-    alert("＜＜＜操作説明＞＞＞\n■移動：上下左右キー\n■回転：スペースキー");
 }
 
 

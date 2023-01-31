@@ -4,6 +4,9 @@
 body {
     margin-top: 0px;
 }
+td {
+    text-align: center;
+}
 .title{
     margin-left: auto;
     margin-right: auto;
@@ -14,4 +17,29 @@ body {
     font-family: 'Bangers', cursive;
     color: rgb(34, 141, 155);
     line-height: 100px;
+}
+.modoru_button {
+    position: relative;
+    margin: auto;
+    top: 10px;
+    left: 10px;
+    width: 80px;
+    height: 40px;
+    text-align: center;
+    border: 2px solid rgb(54, 143, 179);
+    font-size: 20px;
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: .4s;
+    margin-top: 20px;
+    cursor: pointer;
+    font-family: 'Bangers', cursive;
+    line-height: 38px;
+}
+.modoru_button:hover {
+    background-color: #000;
+    border-color: rgb(88, 133, 151);
+    color: snow;
 }

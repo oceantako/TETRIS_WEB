@@ -12,6 +12,8 @@ header {
     text-align: center;
     color:rgb(255, 255, 255);
     line-height: 30px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .center {
@@ -201,4 +203,9 @@ table.tetris_table td.brown {
     background-color: #000;
     border-color: rgb(88, 133, 151);
     color: snow;
+}
+.asobikata {
+    width: 860px;
+    height: 20px;
+    text-align: right;
 }

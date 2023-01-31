@@ -18,51 +18,28 @@
                 <div class="modoru_button"><<< back</div>
             </div>
             <div class="col-10">
-                <div class="title">
-                    {% if ranking_kind == "weekly" %}
-                        Weekly Ranking!!
-                    {% elif ranking_kind == "monthly" %}
-                        Monthly Ranking!!
-                    {% elif ranking_kind == "allseason" %}
-                        AllSeason Ranking!!
-                    {% endif %}
+                <div class="title" style="font-size: 60px;">
+                    ＊お知らせ＊＊＊＊＊＊＊＊＊＊＊＊
                 </div>
             </div>
             <div class="col-1"></div>
         </div>
 
+        <div style="height: 15px;"></div>
+
         <div class="row">
-            <div class="col-2"></div>
-            <table class="table table-success table-hover col-8 caption-top" style="table-layout: fixed">
-                <caption>{{ ranking_kind }}ranking</caption>
-                <thead class="fs-3 text-center">
-                    <tr>
-                    <th style="width: 7%" scope="col"></th>
-                    <th style="width: 24%" scope="col">Name</th>
-                    <th style="width: 9%" scope="col">Blocks</th>
-                    <th style="width: 15%" scope="col">ランク</th>
-                    <th style="width: 20%" scope="col">獲得称号</th>
-                    <th style="width: 25%" scope="col">日付</th>
-                    </tr>
-                </thead>
-                {% if screen_list %}
-                <tbody class="fs-4">
-                    {% for item in screen_list %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter}}位</th>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.blockcount }}</td>
-                        <td>{{ item.rank }}</td>
-                        <td>{{ item.syougou }}</td>
-                        <td>{{ item.date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                {% endif %}
-            </table>
-            <div class="col-2"></div>
+            <div class="col-1"></div>
+            <div class="col-10">
+                <div style="width: 750px; margin: auto;">
+                    <div class="fs-4">現在お知らせはありません。</div>
+                </div>
+            </div>
+            <div class="col-1"></div>
         </div>
-    </div>
+
+        <div style="height: 15px;"></div>
+
+
 
     <form action="{% url 'redisp_tetris' %}" method="post" name="modoru_form">
         {% csrf_token %}
