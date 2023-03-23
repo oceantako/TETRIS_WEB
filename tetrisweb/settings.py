@@ -20,10 +20,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'nv!7_l-(+jje_-c46($va$i3g=28i^8t(%sek_w3^#3j91o1ma'
+# SECRET_KEY = 'nv!7_l-(+jje_-c46($va$i3g=28i^8t(%sek_w3^#3j91o1ma'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+
+env = environ.Env()
+env.read_env(os.path.join(BASE_DIR, '.env'))
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -76,10 +81,11 @@ WSGI_APPLICATION = 'tetrisweb.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': env('DATABASE_ENGINE'),
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 
 # Password validation
