@@ -21,14 +21,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'nv!7_l-(+jje_-c46($va$i3g=28i^8t(%sek_w3^#3j91o1ma'
+from .settings_local import *
 
 # # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-
-env = environ.Env()
-env.read_env(os.path.join(BASE_DIR, '.env'))
-SECRET_KEY = env('SECRET_KEY')
-DEBUG = env('DEBUG')
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -81,7 +77,7 @@ WSGI_APPLICATION = 'tetrisweb.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DATABASE_ENGINE'),
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
